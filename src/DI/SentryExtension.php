@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Rootpd\NetteSentry\DI;
 
-use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 class SentryExtension extends CompilerExtension
 {
@@ -19,18 +20,20 @@ class SentryExtension extends CompilerExtension
         self::PARAM_USER_FIELDS => [],
     ];
 
+    private $enabled = false;
+
     public function loadConfiguration()
     {
-        // load services from config and register them to Nette\DI Container
-        Compiler::loadDefinitions(
-            $this->getContainerBuilder(),
-            $this->loadFromFile(__DIR__.'/../config/config.neon')['services']
-        );
-
         $this->validateConfig($this->defaults);
+        if (!$this->config[self::PARAM_DSN]) {
+            Debugger::log('Unable to initialize SentryExtension, dsn config option is missing', ILogger::WARNING);
+            return;
+        }
+        $this->enabled = true;
 
         $this->getContainerBuilder()
-            ->getDefinition($this->prefix('logger'))
+            ->addDefinition($this->prefix('logger'))
+            ->setFactory(\Rootpd\NetteSentry\SentryLogger::class)
             ->addSetup(
                 'register',
                 [
@@ -47,6 +50,10 @@ class SentryExtension extends CompilerExtension
 
     public function beforeCompile()
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $builder = $this->getContainerBuilder();
         if ($builder->hasDefinition('tracy.logger')) {
             $builder->getDefinition('tracy.logger')->setAutowired(false);
@@ -63,6 +70,10 @@ class SentryExtension extends CompilerExtension
 
     public function afterCompile(\Nette\PhpGenerator\ClassType $class)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $class->getMethod('initialize')
             ->addBody('Tracy\Debugger::setLogger($this->getService(?));', [ $this->prefix('logger') ]);
     }

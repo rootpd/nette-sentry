@@ -1,3 +1,0 @@
-services:
-    sentry.logger:
-        class: Rootpd\NetteSentry\SentryLogger
