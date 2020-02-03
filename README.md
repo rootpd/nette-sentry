@@ -19,7 +19,7 @@ Enable and configure the extension in Nette config file:
 ```neon
 extensions:
 	# ...
-	sentry: Crm\SentryModule\DI\SentryExtension
+	sentry: Rootpd\NetteSentry\DI\SentryExtension
 
 sentry:
     dsn: https://123abc123abc123abc123abc123abc12@sentry.io/3 # required
