@@ -9,7 +9,7 @@ Tracy logger extension capable of logging messages and errors to Sentry.
 Install package via Composer:
 
 ```
-composer require tomaj/nette-errbit
+composer require rootpd/nette-sentry
 ```
 
 ## Configuration
@@ -22,7 +22,7 @@ extensions:
 	sentry: Crm\SentryModule\DI\SentryExtension
 
 sentry:
-    dsn: https://123abc123abc123abc123abc123abc12@sentry.com/3 # required
+    dsn: https://123abc123abc123abc123abc123abc12@sentry.io/3 # required
     environment: production # optional, defaults to "local"
     user_fields: # optional, defaults to empty array; Nette's identity ID is being sent automatically
         - email
