@@ -96,6 +96,8 @@ class SentryLogger extends Logger
 
         if ($value instanceof \Exception) {
             captureException($value);
+        } else if(is_object($value)) {
+            captureException($value);
         } else {
             captureMessage($value);
         }
