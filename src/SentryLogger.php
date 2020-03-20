@@ -29,6 +29,9 @@ class SentryLogger extends Logger
     /** @var array */
     private $userFields = [];
 
+    /** @var array */
+    private $priorityMapping = [];
+
     public function register(string $dsn, string $environment)
     {
         $options = new \Sentry\Options([
@@ -59,6 +62,11 @@ class SentryLogger extends Logger
         $this->userFields = $userFields;
     }
 
+    public function setPriorityMapping(array $priorityMapping)
+    {
+        $this->priorityMapping = $priorityMapping;
+    }
+
     public function setSession(Session $session)
     {
         $this->session = $session;
@@ -67,9 +75,21 @@ class SentryLogger extends Logger
     public function log($value, $priority = ILogger::INFO)
     {
         $response = parent::log($value, $priority);
+        $severity = $this->tracyPriorityToSentrySeverity($priority);
 
-        configureScope(function (\Sentry\State\Scope $scope) use ($priority) {
-            $severity = $this->tracyPriorityToSentrySeverity($priority);
+        // if it's non-default severity, let's try configurable mapping
+        if (!$severity) {
+            $mappedSeverity = $this->priorityMapping[$priority] ?? null;
+            if ($mappedSeverity) {
+                $severity = new Severity((string) $mappedSeverity);
+            }
+        }
+        // if we still don't have severity, don't log anything
+        if (!$severity) {
+            return $response;
+        }
+
+        configureScope(function (\Sentry\State\Scope $scope) use ($severity) {
             if (!$severity) {
                 return;
             }
