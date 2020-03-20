@@ -10,14 +10,16 @@ use Tracy\ILogger;
 
 class SentryExtension extends CompilerExtension
 {
-    const PARAM_DSN = 'dsn';
-    const PARAM_ENVIRONMENT = 'environment';
-    const PARAM_USER_FIELDS = 'user_fields';
+    private const PARAM_DSN = 'dsn';
+    private const PARAM_ENVIRONMENT = 'environment';
+    private const PARAM_USER_FIELDS = 'user_fields';
+    private const PARAM_PRIORITIES_MAPPING = 'priority_mapping';
 
     private $defaults = [
         self::PARAM_DSN => null,
         self::PARAM_ENVIRONMENT => 'local',
         self::PARAM_USER_FIELDS => [],
+        self::PARAM_PRIORITIES_MAPPING => [],
     ];
 
     private $enabled = false;
@@ -44,6 +46,11 @@ class SentryExtension extends CompilerExtension
                 'setUserFields',
                 [
                     $this->config[self::PARAM_USER_FIELDS],
+                ]
+            )->addSetup(
+                'setPriorityMapping',
+                [
+                    $this->config[self::PARAM_PRIORITIES_MAPPING],
                 ]
             );
     }

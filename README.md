@@ -26,7 +26,23 @@ sentry:
     environment: production # optional, defaults to "local"
     user_fields: # optional, defaults to empty array; Nette's identity ID is being sent automatically
         - email
+    priority_mapping:
+        mypriority: warning
 ```
+
+### Priority-Severity mapping
+
+Sometimes you might need to use custom *priority* when logging the error in Nette:
+
+```php
+\Tracy\Debugger::log('foo', 'mypriority');
+```
+
+Sentry only allows strict set of severities. By default any message with unknown (non-standard) severity is not being logged.
+
+You can map your custom *priority* to Sentry's *severity* in config by using `priority_mapping` as shown in the example.
+
+The allowed set of Sentry severities can be checked in [Sentry's PHP repository](https://github.com/getsentry/sentry-php/blob/master/src/Severity.php).  
 
 ## Usage
 
