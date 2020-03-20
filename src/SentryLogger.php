@@ -114,7 +114,7 @@ class SentryLogger extends Logger
             }
         });
 
-        if ($value instanceof \Exception) {
+        if ($value instanceof \Throwable) {
             captureException($value);
         } else {
             captureMessage($value);
