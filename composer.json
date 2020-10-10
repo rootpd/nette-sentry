@@ -20,11 +20,18 @@
     "nette/http": "^2.4 || ^3.0"
   },
   "require-dev": {
+    "ninjify/nunjuck": "^0.3",
     "squizlabs/php_codesniffer": "~3.5"
   },
   "autoload": {
     "psr-4": {
       "Rootpd\\NetteSentry\\": "src"
     }
+  },
+  "scripts": {
+    "cs": "phpcs --standard=PSR2 --extensions=php,phpt src tests --ignore=tests/tmp",
+    "cs-fix": "phpcbf --standard=PSR2 --extensions=php,phpt src tests --ignore=tests/tmp",
+    "test": "tester -C tests",
+    "coverage": "tester -p phpdbg -C --coverage coverage.xml --coverage-src src tests"
   }
 }
