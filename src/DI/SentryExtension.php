@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Rootpd\NetteSentry\DI;
 
 use Nette\DI\CompilerExtension;
+use Nette\PhpGenerator\ClassType;
+use Rootpd\NetteSentry\SentryLogger;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
@@ -35,7 +37,7 @@ class SentryExtension extends CompilerExtension
 
         $this->getContainerBuilder()
             ->addDefinition($this->prefix('logger'))
-            ->setFactory(\Rootpd\NetteSentry\SentryLogger::class)
+            ->setFactory(SentryLogger::class, [Debugger::$logDirectory])
             ->addSetup(
                 'register',
                 [
@@ -75,7 +77,7 @@ class SentryExtension extends CompilerExtension
         }
     }
 
-    public function afterCompile(\Nette\PhpGenerator\ClassType $class)
+    public function afterCompile(ClassType $class)
     {
         if (!$this->enabled) {
             return;
