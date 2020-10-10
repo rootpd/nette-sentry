@@ -54,7 +54,9 @@ class SentryLogger extends Logger
 
     public function setUser(User $user)
     {
-        $this->identity = $user->getIdentity();
+        if ($user->isLoggedIn()) {
+            $this->identity = $user->getIdentity();
+        }
     }
 
     public function setUserFields(array $userFields)
