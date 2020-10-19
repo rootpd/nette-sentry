@@ -12,6 +12,7 @@ use Sentry\Integration\RequestIntegration;
 use Sentry\Severity;
 use Sentry\State\Hub;
 use Tracy\Debugger;
+use Tracy\Dumper;
 use Tracy\ILogger;
 use Tracy\Logger;
 use function Sentry\captureException;
@@ -119,7 +120,7 @@ class SentryLogger extends Logger
         if ($value instanceof \Throwable) {
             captureException($value);
         } else {
-            captureMessage($value);
+            captureMessage(is_string($value) ? $value : Dumper::toText($value));
         }
 
         return $response;
