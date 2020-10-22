@@ -7,16 +7,18 @@ namespace Rootpd\NetteSentry;
 use Nette\Http\Session;
 use Nette\Security\IIdentity;
 use Nette\Security\User;
-use Sentry\ClientBuilder;
 use Sentry\Integration\RequestIntegration;
 use Sentry\Severity;
-use Sentry\State\Hub;
+use Sentry\State\Scope;
+use Throwable;
 use Tracy\Debugger;
+use Tracy\Dumper;
 use Tracy\ILogger;
 use Tracy\Logger;
 use function Sentry\captureException;
 use function Sentry\captureMessage;
 use function Sentry\configureScope;
+use function Sentry\init;
 
 class SentryLogger extends Logger
 {
@@ -34,19 +36,14 @@ class SentryLogger extends Logger
 
     public function register(string $dsn, string $environment)
     {
-        $options = new \Sentry\Options([
+        init([
             'dsn' => $dsn,
             'environment' => $environment,
             'default_integrations' => false,
+            'integrations' => [
+                new RequestIntegration(),
+            ],
         ]);
-
-        $options->setIntegrations([
-            new RequestIntegration($options),
-        ]);
-
-        $builder = new ClientBuilder($options);
-        $client = $builder->getClient();
-        Hub::setCurrent(new Hub($client));
 
         $this->email = & Debugger::$email;
         $this->directory = Debugger::$logDirectory;
@@ -54,7 +51,9 @@ class SentryLogger extends Logger
 
     public function setUser(User $user)
     {
-        $this->identity = $user->getIdentity();
+        if ($user->isLoggedIn()) {
+            $this->identity = $user->getIdentity();
+        }
     }
 
     public function setUserFields(array $userFields)
@@ -89,7 +88,7 @@ class SentryLogger extends Logger
             return $response;
         }
 
-        configureScope(function (\Sentry\State\Scope $scope) use ($severity) {
+        configureScope(function (Scope $scope) use ($severity) {
             if (!$severity) {
                 return;
             }
@@ -114,10 +113,10 @@ class SentryLogger extends Logger
             }
         });
 
-        if ($value instanceof \Throwable) {
+        if ($value instanceof Throwable) {
             captureException($value);
         } else {
-            captureMessage($value);
+            captureMessage(is_string($value) ? $value : Dumper::toText($value));
         }
 
         return $response;
