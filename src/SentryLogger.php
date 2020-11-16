@@ -39,6 +39,7 @@ class SentryLogger extends Logger
         init([
             'dsn' => $dsn,
             'environment' => $environment,
+            'attach_stacktrace' => true,
             'default_integrations' => false,
             'integrations' => [
                 new RequestIntegration(),
