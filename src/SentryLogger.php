@@ -22,8 +22,8 @@ use function Sentry\init;
 
 class SentryLogger extends Logger
 {
-    /** @var IIdentity */
-    private $identity;
+    /** @var User */
+    private $user = null;
 
     /** @var Session */
     private $session;
@@ -52,9 +52,7 @@ class SentryLogger extends Logger
 
     public function setUser(User $user)
     {
-        if ($user->isLoggedIn()) {
-            $this->identity = $user->getIdentity();
-        }
+        $this->user = $user;
     }
 
     public function setUserFields(array $userFields)
@@ -70,6 +68,16 @@ class SentryLogger extends Logger
     public function setSession(Session $session)
     {
         $this->session = $session;
+    }
+
+    /**
+     * @return IIdentity|null
+     */
+    public function getIdentity()
+    {
+        return $this->user !== null && $this->user->isLoggedIn()
+            ? $this->user->getIdentity()
+            : null;
     }
 
     public function log($value, $priority = ILogger::INFO)
@@ -94,12 +102,12 @@ class SentryLogger extends Logger
                 return;
             }
             $scope->setLevel($severity);
-            if ($this->identity) {
+            if ($this->getIdentity() !== null) {
                 $userFields = [
-                    'id' => $this->identity->getId(),
+                    'id' => $this->getIdentity()->getId(),
                 ];
                 foreach ($this->userFields as $name) {
-                    $userFields[$name] = $this->identity->{$name} ?? null;
+                    $userFields[$name] = $this->getIdentity()->{$name} ?? null;
                 }
                 $scope->setUser($userFields);
             }
