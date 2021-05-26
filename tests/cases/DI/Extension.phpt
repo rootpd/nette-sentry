@@ -41,7 +41,8 @@ test(function (): void {
     Assert::with($logger, function () use ($config): void {
         Assert::null($this->session);
 
-        Assert::null($this->identity);
+        Assert::null($this->user);
+        Assert::null($this->getIdentity());
 
         Assert::same([], $this->userFields);
 
@@ -86,11 +87,13 @@ test(function (): void {
 
     Assert::type(SentryLogger::class, $logger);
 
-    Assert::with($logger, function () use ($config, $identity): void {
+    Assert::with($logger, function () use ($config, $user, $identity): void {
         Assert::type(Session::class, $this->session);
 
-        Assert::type(IIdentity::class, $this->identity);
-        Assert::same($identity, $this->identity);
+        Assert::type(User::class, $this->user);
+        Assert::same($user, $this->user);
+        Assert::type(IIdentity::class, $this->getIdentity());
+        Assert::same($identity, $this->getIdentity());
 
         Assert::same($config['user_fields'], $this->userFields);
 
