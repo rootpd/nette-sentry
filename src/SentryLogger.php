@@ -22,6 +22,13 @@ use function Sentry\init;
 
 class SentryLogger extends Logger
 {
+
+	/** @var string */
+	private $dsn;
+
+	/** @var string */
+	private $environment;
+
     /** @var User */
     private $user = null;
 
@@ -36,9 +43,12 @@ class SentryLogger extends Logger
 
     public function register(string $dsn, string $environment)
     {
+    	$this->dsn = $dsn;
+    	$this->environment = $environment;
+
         init([
-            'dsn' => $dsn,
-            'environment' => $environment,
+            'dsn' => $this->dsn,
+            'environment' => $this->environment,
             'attach_stacktrace' => true,
             'default_integrations' => false,
             'integrations' => [
@@ -49,6 +59,16 @@ class SentryLogger extends Logger
         $this->email = & Debugger::$email;
         $this->directory = Debugger::$logDirectory;
     }
+
+	public function getDsn(): string
+	{
+		return $this->dsn;
+	}
+
+	public function getEnvironment(): string
+	{
+		return $this->environment;
+	}
 
     public function setUser(User $user)
     {

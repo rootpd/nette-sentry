@@ -39,6 +39,8 @@ test(function (): void {
     Assert::type(SentryLogger::class, $logger);
 
     Assert::with($logger, function () use ($config): void {
+        Assert::same($config['dsn'], $this->getDsn());
+
         Assert::null($this->session);
 
         Assert::null($this->user);
@@ -88,6 +90,9 @@ test(function (): void {
     Assert::type(SentryLogger::class, $logger);
 
     Assert::with($logger, function () use ($config, $user, $identity): void {
+        Assert::same($config['dsn'], $this->getDsn());
+        Assert::same($config['environment'], $this->getEnvironment());
+
         Assert::type(Session::class, $this->session);
 
         Assert::type(User::class, $this->user);
