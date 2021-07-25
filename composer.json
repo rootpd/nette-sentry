@@ -11,7 +11,7 @@
   ],
   "type": "library",
   "require": {
-    "php": "^7.2",
+    "php": "^8.0",
     "nette/di": "^2.4.7 || ^3.0",
     "nette/http": "^2.4.7 || ^3.0",
     "nette/security": "^2.4 || ^3.0",
