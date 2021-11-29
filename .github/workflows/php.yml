@@ -1,4 +1,4 @@
-name: PHP Composer
+name: Test
 
 on:
   push:
@@ -7,22 +7,53 @@ on:
     branches: [ master ]
 
 jobs:
-  sniff_74:
-
+  sniff_72:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
-    
     - name: Cache Composer dependencies
       uses: actions/cache@v2
       with:
         path: /tmp/composer-cache
         key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
-        
+    - uses: php-actions/composer@v6
+      with:
+          php_version: 7.2
+    - name: Run sniffer
+      run: composer cs
+    - name: Run tests
+      run: composer cs
+      
+  sniff_74:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Cache Composer dependencies
+      uses: actions/cache@v2
+      with:
+        path: /tmp/composer-cache
+        key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
     - uses: php-actions/composer@v6
       with:
           php_version: 7.4
-    
-    - name: Remove auth.json file
+    - name: Run sniffer
+      run: composer cs
+    - name: Run tests
+      run: composer cs
+
+  sniff_80:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Cache Composer dependencies
+      uses: actions/cache@v2
+      with:
+        path: /tmp/composer-cache
+        key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+    - uses: php-actions/composer@v6
+      with:
+          php_version: 8.0
+    - name: Run sniffer
+      run: composer cs
+    - name: Run tests
       run: composer cs
