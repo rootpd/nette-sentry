@@ -3,6 +3,7 @@ php:
   - 7.2
   - 7.3
   - 7.4
+  - 8.0
 
 before_install:
   # Turn off XDebug
@@ -31,6 +32,11 @@ jobs:
 
     - stage: cs
       php: 7.4
+      script:
+        - composer cs
+
+    - stage: cs
+      php: 8.0
       script:
         - composer cs
 
