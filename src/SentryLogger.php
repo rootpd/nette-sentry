@@ -34,12 +34,13 @@ class SentryLogger extends Logger
     /** @var array */
     private $priorityMapping = [];
 
-    public function register(string $dsn, string $environment)
+    public function register(string $dsn, string $environment, float $tracesSampleRate)
     {
         init([
             'dsn' => $dsn,
             'environment' => $environment,
             'attach_stacktrace' => true,
+            'traces_sample_rate' => $tracesSampleRate,
             'default_integrations' => false,
             'integrations' => [
                 new RequestIntegration(),

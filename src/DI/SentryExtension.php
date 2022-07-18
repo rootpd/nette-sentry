@@ -16,12 +16,14 @@ class SentryExtension extends CompilerExtension
     private const PARAM_ENVIRONMENT = 'environment';
     private const PARAM_USER_FIELDS = 'user_fields';
     private const PARAM_PRIORITIES_MAPPING = 'priority_mapping';
+    private const PARAM_TRACES_SAMPLE_RATE = 'traces_sample_rate';
 
     private $defaults = [
         self::PARAM_DSN => null,
         self::PARAM_ENVIRONMENT => 'local',
         self::PARAM_USER_FIELDS => [],
         self::PARAM_PRIORITIES_MAPPING => [],
+        self::PARAM_TRACES_SAMPLE_RATE => 0,
     ];
 
     private $enabled = false;
@@ -43,6 +45,7 @@ class SentryExtension extends CompilerExtension
                 [
                     $this->config[self::PARAM_DSN],
                     $this->config[self::PARAM_ENVIRONMENT],
+                    $this->config[self::PARAM_TRACES_SAMPLE_RATE],
                 ]
             )->addSetup(
                 'setUserFields',
