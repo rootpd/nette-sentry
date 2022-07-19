@@ -1,5 +1,7 @@
 # Nette Sentry
 
+[![Build Status](https://app.travis-ci.com/rootpd/nette-sentry.svg?branch=master)](https://app.travis-ci.com/rootpd/nette-sentry)
+
 Tracy logger extension capable of logging messages and errors to Sentry.
 
 *Note*: If you have debug mode enabled in your application, logger will only send `\Tracy\Debugger::log()` messages to sentry. Any exception ending with Tracy's blue screen is not going to be logged as you can see the exception details directly.
