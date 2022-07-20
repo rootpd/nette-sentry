@@ -23,7 +23,7 @@ class SentryExtension extends CompilerExtension
         self::PARAM_ENVIRONMENT => 'local',
         self::PARAM_USER_FIELDS => [],
         self::PARAM_PRIORITIES_MAPPING => [],
-        self::PARAM_TRACES_SAMPLE_RATE => 0,
+        self::PARAM_TRACES_SAMPLE_RATE => 0.0,
     ];
 
     private $enabled = false;
@@ -40,12 +40,16 @@ class SentryExtension extends CompilerExtension
         $this->getContainerBuilder()
             ->addDefinition($this->prefix('logger'))
             ->setFactory(SentryLogger::class, [Debugger::$logDirectory])
+            ->addSetup('setTracesSampleRate',
+                [
+                    $this->config[self::PARAM_TRACES_SAMPLE_RATE]
+                ]
+            )
             ->addSetup(
                 'register',
                 [
                     $this->config[self::PARAM_DSN],
                     $this->config[self::PARAM_ENVIRONMENT],
-                    $this->config[self::PARAM_TRACES_SAMPLE_RATE],
                 ]
             )->addSetup(
                 'setUserFields',

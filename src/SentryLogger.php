@@ -34,13 +34,16 @@ class SentryLogger extends Logger
     /** @var array */
     private $priorityMapping = [];
 
-    public function register(string $dsn, string $environment, float $tracesSampleRate)
+    /** @var float */
+    private $tracesSampleRate = 0.0;
+
+    public function register(string $dsn, string $environment)
     {
         init([
             'dsn' => $dsn,
             'environment' => $environment,
             'attach_stacktrace' => true,
-            'traces_sample_rate' => $tracesSampleRate,
+            'traces_sample_rate' => $this->tracesSampleRate,
             'default_integrations' => false,
             'integrations' => [
                 new RequestIntegration(),
@@ -69,6 +72,11 @@ class SentryLogger extends Logger
     public function setSession(Session $session)
     {
         $this->session = $session;
+    }
+
+    public function setTracesSampleRate(float $tracesSampleRate)
+    {
+        $this->tracesSampleRate = $tracesSampleRate;
     }
 
     /**
