@@ -65,7 +65,8 @@ test(function (): void {
         ],
         'priority_mapping' => [
             'mypriority' => 'warning',
-        ]
+        ],
+        'traces_sample_rate' => 0.5,
     ];
 
     $loader = new ContainerLoader(TEMP_DIR, true);
@@ -106,5 +107,6 @@ test(function (): void {
         Assert::same($config['user_fields'], $this->userFields);
         Assert::same($config['session_sections'], $this->sessionSections);
         Assert::same($config['priority_mapping'], $this->priorityMapping);
+        Assert::same($config['traces_sample_rate'], $this->tracesSampleRate);
     });
 });

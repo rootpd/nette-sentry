@@ -24,41 +24,38 @@ class SentryExtension extends CompilerExtension
         }
         $this->enabled = true;
 
-        $this->getContainerBuilder()
+        $logger = $this->getContainerBuilder()
             ->addDefinition($this->prefix('logger'))
-            ->setFactory(SentryLogger::class, [Debugger::$logDirectory])
-            ->addSetup(
-                'register',
-                [
-                    $this->config->dsn,
-                    $this->config->environment,
-                ]
-            )->addSetup(
-                'setUserFields',
-                [
-                    $this->config->user_fields,
-                ]
-            )->addSetup(
-                'setSessionSections',
-                [
-                    $this->config->session_sections,
-                ]
-            )->addSetup(
-                'setPriorityMapping',
-                [
-                    $this->config->priority_mapping,
-                ]
-            );
+            ->setFactory(SentryLogger::class, [Debugger::$logDirectory]);
+
+        // configure logger before registering the Sentry SDK
+
+        $logger
+            ->addSetup('setUserFields', [$this->config->user_fields])
+            ->addSetup('setSessionSections', [$this->config->session_sections])
+            ->addSetup('setPriorityMapping', [$this->config->priority_mapping]);
+
+        if ($this->config->traces_sample_rate !== null) {
+            $logger->addSetup('setTracesSampleRate', [$this->config->traces_sample_rate]);
+        }
+
+        // register Sentry SDK
+
+        $logger->addSetup('register', [
+            $this->config->dsn,
+            $this->config->environment,
+        ]);
     }
 
     public function getConfigSchema(): Schema
     {
         return Expect::structure([
-            'dsn' => Expect::string()->dynamic()->default(null),
-            'environment' => Expect::string()->dynamic()->default('local'),
+            'dsn' => Expect::string()->dynamic(),
+            'environment' => Expect::string('local')->dynamic(),
             'user_fields' => Expect::listOf(Expect::string())->default([]),
             'session_sections' => Expect::listOf(Expect::string())->default([]),
             'priority_mapping' => Expect::arrayOf(Expect::string(), Expect::string())->default([]),
+            'traces_sample_rate' => Expect::float()->dynamic(),
         ]);
     }
 

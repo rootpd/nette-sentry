@@ -22,15 +22,15 @@ use function Sentry\init;
 
 class SentryLogger extends Logger
 {
+    private ?User $user = null;
+    private ?Session $session = null;
+
     private string $dsn;
     private string $environment;
-    private ?User $user = null;
-
-    /** @var Session */
-    private $session;
     private array $userFields = [];
     private array $sessionSections = [];
     private array $priorityMapping = [];
+    private ?float $tracesSampleRate = null;
 
     public function register(string $dsn, string $environment)
     {
@@ -42,6 +42,7 @@ class SentryLogger extends Logger
             'environment' => $this->environment,
             'attach_stacktrace' => true,
             'default_integrations' => false,
+            'traces_sample_rate' => $this->tracesSampleRate,
             'integrations' => [
                 new RequestIntegration(),
             ],
@@ -79,6 +80,11 @@ class SentryLogger extends Logger
     public function setPriorityMapping(array $priorityMapping)
     {
         $this->priorityMapping = $priorityMapping;
+    }
+
+    public function setTracesSampleRate(float $tracesSampleRate)
+    {
+        $this->tracesSampleRate = $tracesSampleRate;
     }
 
     public function setSession(Session $session)
