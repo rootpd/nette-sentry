@@ -1,10 +1,8 @@
 language: php
 php:
-  - 7.2
-  - 7.3
-  - 7.4
   - 8.0
   - 8.1
+  - 8.2
 
 before_install:
   # Turn off XDebug
@@ -24,20 +22,20 @@ after_failure:
 
 jobs:
   include:
-    - env: title="Lowest Dependencies 7.2"
-      php: 7.2
+    - env: title="Lowest Dependencies 8.0"
+      php: 8.0
       install:
         - travis_retry composer update --no-interaction --no-progress --prefer-dist --prefer-lowest
       script:
         - composer test
 
     - stage: cs
-      php: 7.4
+      php: 8.0
       script:
         - composer cs
 
     - stage: cs
-      php: 8.0
+      php: 8.1
       script:
         - composer cs
 
