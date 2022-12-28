@@ -28,6 +28,8 @@ sentry:
     environment: production # optional, defaults to "local"
     user_fields: # optional, defaults to empty array; Nette's identity ID is being sent automatically
         - email
+    session_sections: # optional, list of session sections to track
+        - mySection
     priority_mapping:
         mypriority: warning
 ```

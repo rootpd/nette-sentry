@@ -6,30 +6,19 @@ namespace Rootpd\NetteSentry\DI;
 
 use Nette\DI\CompilerExtension;
 use Nette\PhpGenerator\ClassType;
+use Nette\Schema\Expect;
+use Nette\Schema\Schema;
 use Rootpd\NetteSentry\SentryLogger;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
 class SentryExtension extends CompilerExtension
 {
-    private const PARAM_DSN = 'dsn';
-    private const PARAM_ENVIRONMENT = 'environment';
-    private const PARAM_USER_FIELDS = 'user_fields';
-    private const PARAM_PRIORITIES_MAPPING = 'priority_mapping';
-
-    private $defaults = [
-        self::PARAM_DSN => null,
-        self::PARAM_ENVIRONMENT => 'local',
-        self::PARAM_USER_FIELDS => [],
-        self::PARAM_PRIORITIES_MAPPING => [],
-    ];
-
-    private $enabled = false;
+    private bool $enabled = false;
 
     public function loadConfiguration()
     {
-        $this->validateConfig($this->defaults);
-        if (!$this->config[self::PARAM_DSN]) {
+        if (!$this->config->dsn) {
             Debugger::log('Unable to initialize SentryExtension, dsn config option is missing', ILogger::WARNING);
             return;
         }
@@ -41,20 +30,36 @@ class SentryExtension extends CompilerExtension
             ->addSetup(
                 'register',
                 [
-                    $this->config[self::PARAM_DSN],
-                    $this->config[self::PARAM_ENVIRONMENT],
+                    $this->config->dsn,
+                    $this->config->environment,
                 ]
             )->addSetup(
                 'setUserFields',
                 [
-                    $this->config[self::PARAM_USER_FIELDS],
+                    $this->config->user_fields,
+                ]
+            )->addSetup(
+                'setSessionSections',
+                [
+                    $this->config->session_sections,
                 ]
             )->addSetup(
                 'setPriorityMapping',
                 [
-                    $this->config[self::PARAM_PRIORITIES_MAPPING],
+                    $this->config->priority_mapping,
                 ]
             );
+    }
+
+    public function getConfigSchema(): Schema
+    {
+        return Expect::structure([
+            'dsn' => Expect::string()->dynamic()->default(null),
+            'environment' => Expect::string()->dynamic()->default('local'),
+            'user_fields' => Expect::listOf(Expect::string())->default([]),
+            'session_sections' => Expect::listOf(Expect::string())->default([]),
+            'priority_mapping' => Expect::arrayOf(Expect::string(), Expect::string())->default([]),
+        ]);
     }
 
     public function beforeCompile()

@@ -7,8 +7,8 @@ use Nette\DI\Compiler;
 use Nette\DI\Container;
 use Nette\DI\ContainerLoader;
 use Nette\Http\Session;
-use Nette\Security\Identity;
 use Nette\Security\IIdentity;
+use Nette\Security\SimpleIdentity;
 use Nette\Security\User;
 use Rootpd\NetteSentry\DI\SentryExtension;
 use Rootpd\NetteSentry\SentryLogger;
@@ -60,6 +60,9 @@ test(function (): void {
         'user_fields' => [
             'email',
         ],
+        'session_sections' => [
+            'my_section',
+        ],
         'priority_mapping' => [
             'mypriority' => 'warning',
         ]
@@ -81,7 +84,7 @@ test(function (): void {
     $container = new $class();
 
     $user = $container->getByType(User::class);
-    $identity = new Identity(1, null, ['email' => '']);
+    $identity = new SimpleIdentity(1, null, ['email' => '']);
     $user->login($identity);
 
     /** @var SentryLogger $logger */
@@ -101,7 +104,7 @@ test(function (): void {
         Assert::same($identity, $this->getIdentity());
 
         Assert::same($config['user_fields'], $this->userFields);
-
+        Assert::same($config['session_sections'], $this->sessionSections);
         Assert::same($config['priority_mapping'], $this->priorityMapping);
     });
 });

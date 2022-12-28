@@ -22,23 +22,15 @@ use function Sentry\init;
 
 class SentryLogger extends Logger
 {
-    /** @var string */
-    private $dsn;
-
-    /** @var string */
-    private $environment;
-
-    /** @var User */
-    private $user = null;
+    private string $dsn;
+    private string $environment;
+    private ?User $user = null;
 
     /** @var Session */
     private $session;
-
-    /** @var array */
-    private $userFields = [];
-
-    /** @var array */
-    private $priorityMapping = [];
+    private array $userFields = [];
+    private array $sessionSections = [];
+    private array $priorityMapping = [];
 
     public function register(string $dsn, string $environment)
     {
@@ -79,6 +71,11 @@ class SentryLogger extends Logger
         $this->userFields = $userFields;
     }
 
+    public function setSessionSections(array $sessionSections)
+    {
+        $this->sessionSections = $sessionSections;
+    }
+
     public function setPriorityMapping(array $priorityMapping)
     {
         $this->priorityMapping = $priorityMapping;
@@ -89,10 +86,7 @@ class SentryLogger extends Logger
         $this->session = $session;
     }
 
-    /**
-     * @return IIdentity|null
-     */
-    public function getIdentity()
+    public function getIdentity(): ?IIdentity
     {
         return $this->user !== null && $this->user->isLoggedIn()
             ? $this->user->getIdentity()
@@ -132,7 +126,7 @@ class SentryLogger extends Logger
             }
             if ($this->session) {
                 $data = [];
-                foreach ($this->session->getIterator() as $section) {
+                foreach ($this->sessionSections as $section) {
                     foreach ($this->session->getSection($section)->getIterator() as $key => $val) {
                         $data[$section][$key] = $val;
                     }
