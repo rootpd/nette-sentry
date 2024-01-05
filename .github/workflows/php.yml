@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  sniff_72:
+  sniff_81:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -18,30 +18,13 @@ jobs:
         key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
     - uses: php-actions/composer@v6
       with:
-          php_version: 7.2
-    - name: Run sniffer
-      run: composer cs
-    - name: Run tests
-      run: composer cs
-      
-  sniff_74:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Cache Composer dependencies
-      uses: actions/cache@v2
-      with:
-        path: /tmp/composer-cache
-        key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
-    - uses: php-actions/composer@v6
-      with:
-          php_version: 7.4
+          php_version: 8.1
     - name: Run sniffer
       run: composer cs
     - name: Run tests
       run: composer cs
 
-  sniff_80:
+  sniff_82:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -52,7 +35,24 @@ jobs:
         key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
     - uses: php-actions/composer@v6
       with:
-          php_version: 8.0
+          php_version: 8.2
+    - name: Run sniffer
+      run: composer cs
+    - name: Run tests
+      run: composer cs
+
+  sniff_83:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Cache Composer dependencies
+      uses: actions/cache@v2
+      with:
+        path: /tmp/composer-cache
+        key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+    - uses: php-actions/composer@v6
+      with:
+          php_version: 8.3
     - name: Run sniffer
       run: composer cs
     - name: Run tests
