@@ -10,6 +10,10 @@ jobs:
   sniff_81:
     runs-on: ubuntu-latest
     steps:
+    - name: Setup PHP with tools
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.1
     - uses: actions/checkout@v4
     - name: Cache Composer dependencies
       uses: actions/cache@v3
@@ -19,6 +23,7 @@ jobs:
     - uses: php-actions/composer@v6
       with:
           php_version: 8.1
+
     - name: Run sniffer
       run: composer cs
     - name: Run tests
@@ -27,6 +32,10 @@ jobs:
   sniff_82:
     runs-on: ubuntu-latest
     steps:
+    - name: Setup PHP with tools
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.2
     - uses: actions/checkout@v4
     - name: Cache Composer dependencies
       uses: actions/cache@v3
@@ -44,6 +53,10 @@ jobs:
   sniff_83:
     runs-on: ubuntu-latest
     steps:
+    - name: Setup PHP with tools
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.3
     - uses: actions/checkout@v4
     - name: Cache Composer dependencies
       uses: actions/cache@v3

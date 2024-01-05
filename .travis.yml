@@ -22,20 +22,25 @@ after_failure:
 
 jobs:
   include:
-    - env: title="Lowest Dependencies 8.0"
-      php: 8.0
+    - env: title="Lowest Dependencies 8.1"
+      php: 8.1
       install:
         - travis_retry composer update --no-interaction --no-progress --prefer-dist --prefer-lowest
       script:
         - composer test
 
     - stage: cs
-      php: 8.0
+      php: 8.1
       script:
         - composer cs
 
     - stage: cs
-      php: 8.1
+      php: 8.2
+      script:
+        - composer cs
+
+    - stage: cs
+      php: 8.3
       script:
         - composer cs
 
