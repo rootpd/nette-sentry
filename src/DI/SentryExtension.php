@@ -5,10 +5,15 @@ declare(strict_types=1);
 namespace Rootpd\NetteSentry\DI;
 
 use Nette\DI\CompilerExtension;
+use Nette\DI\Definitions\ServiceDefinition;
+use Nette\DI\Definitions\Statement;
 use Nette\PhpGenerator\ClassType;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
+use Rootpd\NetteSentry\ApplicationMonitor;
 use Rootpd\NetteSentry\SentryLogger;
+use Sentry\Integration\EnvironmentIntegration;
+use Sentry\Integration\TransactionIntegration;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
@@ -37,6 +42,21 @@ class SentryExtension extends CompilerExtension
 
         if ($this->config->traces_sample_rate !== null) {
             $logger->addSetup('setTracesSampleRate', [$this->config->traces_sample_rate]);
+
+            $this->getContainerBuilder()
+                ->addDefinition($this->prefix('applicationMonitor'))
+                ->setFactory(ApplicationMonitor::class);
+
+            /** @var ServiceDefinition $application */
+            $application = $this->getContainerBuilder()->getDefinition('application.application');
+            $application->addSetup('@Rootpd\NetteSentry\ApplicationMonitor::hook', ['@self']);
+
+            if ($this->config->profiles_sample_rate !== null) {
+                $logger->addSetup('setProfilesSampleRate', [$this->config->profiles_sample_rate]);
+            }
+
+            $integrations[] = new Statement(TransactionIntegration::class);
+            $integrations[] = new Statement(EnvironmentIntegration::class);
         }
 
         // register Sentry SDK
@@ -44,6 +64,7 @@ class SentryExtension extends CompilerExtension
         $logger->addSetup('register', [
             $this->config->dsn,
             $this->config->environment,
+            $integrations,
         ]);
     }
 
@@ -56,6 +77,7 @@ class SentryExtension extends CompilerExtension
             'session_sections' => Expect::listOf(Expect::string())->default([]),
             'priority_mapping' => Expect::arrayOf(Expect::string(), Expect::string())->default([]),
             'traces_sample_rate' => Expect::float()->dynamic(),
+            'profiles_sample_rate' => Expect::float()->dynamic(),
         ]);
     }
 
