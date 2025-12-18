@@ -11,6 +11,7 @@ use Nette\PhpGenerator\ClassType;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Rootpd\NetteSentry\ApplicationMonitor;
+use Rootpd\NetteSentry\DatabaseConnection;
 use Rootpd\NetteSentry\SentryLogger;
 use Sentry\Integration\EnvironmentIntegration;
 use Sentry\Integration\TransactionIntegration;
@@ -55,6 +56,13 @@ class SentryExtension extends CompilerExtension
                 $logger->addSetup('setProfilesSampleRate', [$this->config->profiles_sample_rate]);
             }
 
+            if ($this->config->db_tracing) {
+                /** @var ServiceDefinition $dbDefinition */
+                $dbDefinition = $this->getContainerBuilder()->getDefinition('database.default.connection');
+                $dbFactory = $dbDefinition->getFactory();
+                $dbDefinition->setFactory(DatabaseConnection::class, $dbFactory->arguments);
+            }
+
             $integrations[] = new Statement(TransactionIntegration::class);
             $integrations[] = new Statement(EnvironmentIntegration::class);
         }
@@ -71,6 +79,7 @@ class SentryExtension extends CompilerExtension
     public function getConfigSchema(): Schema
     {
         return Expect::structure([
+            // sentry configs
             'dsn' => Expect::string()->dynamic(),
             'environment' => Expect::string('local')->dynamic(),
             'user_fields' => Expect::listOf(Expect::string())->default([]),
@@ -78,6 +87,9 @@ class SentryExtension extends CompilerExtension
             'priority_mapping' => Expect::arrayOf(Expect::string(), Expect::string())->default([]),
             'traces_sample_rate' => Expect::float()->dynamic(),
             'profiles_sample_rate' => Expect::float()->dynamic(),
+
+            // extension configs
+            'db_tracing' => Expect::bool(false)->dynamic(),
         ]);
     }
 

@@ -30,8 +30,10 @@ sentry:
         - email
     session_sections: # optional, list of session sections to track
         - mySection
-    priority_mapping:
+    priority_mapping: # optional, mapping of custom log levels to ones that's Sentry aware of
         mypriority: warning
+
+    db_tracing: true # optional, defaults to "false", wraps DB connection so it adds span for every query
 ```
 
 ### Priority-Severity mapping
