@@ -41,6 +41,8 @@ class SentryExtension extends CompilerExtension
             ->addSetup('setSessionSections', [$this->config->session_sections])
             ->addSetup('setPriorityMapping', [$this->config->priority_mapping]);
 
+        $integrations = [];
+
         if ($this->config->traces_sample_rate !== null) {
             $logger->addSetup('setTracesSampleRate', [$this->config->traces_sample_rate]);
 
