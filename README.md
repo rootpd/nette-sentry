@@ -32,6 +32,9 @@ sentry:
         - mySection
     priority_mapping: # optional, mapping of custom log levels to ones that's Sentry aware of
         mypriority: warning
+    ignore_exceptions: # optional, list of exception class names to ignore
+        - Tomaj\Hermes\Shutdown\ShutdownException
+        - App\MyCustomException
 
     db_tracing: true # optional, defaults to "false", wraps DB connection so it adds span for every query
 ```
@@ -48,7 +51,22 @@ Sentry only allows strict set of severities. By default any message with unknown
 
 You can map your custom *priority* to Sentry's *severity* in config by using `priority_mapping` as shown in the example.
 
-The allowed set of Sentry severities can be checked in [Sentry's PHP repository](https://github.com/getsentry/sentry-php/blob/master/src/Severity.php).  
+The allowed set of Sentry severities can be checked in [Sentry's PHP repository](https://github.com/getsentry/sentry-php/blob/master/src/Severity.php).
+
+### Ignoring exceptions
+
+In some cases, you might want to prevent certain exceptions from being sent to Sentry while still logging them locally via Tracy. This is useful for expected exceptions like graceful shutdown signals or business logic exceptions that don't require monitoring.
+
+Use `ignore_exceptions` config option to specify exception class names that should be ignored:
+
+```neon
+sentry:
+    ignore_exceptions:
+        - Tomaj\Hermes\Shutdown\ShutdownException
+        - App\MyCustomException
+```
+
+Ignored exceptions will still be logged to Tracy's local log files but won't be sent to Sentry.
 
 ## Usage
 

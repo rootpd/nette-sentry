@@ -39,7 +39,8 @@ class SentryExtension extends CompilerExtension
         $logger
             ->addSetup('setUserFields', [$this->config->user_fields])
             ->addSetup('setSessionSections', [$this->config->session_sections])
-            ->addSetup('setPriorityMapping', [$this->config->priority_mapping]);
+            ->addSetup('setPriorityMapping', [$this->config->priority_mapping])
+            ->addSetup('setIgnoredExceptions', [$this->config->ignore_exceptions]);
 
         $integrations = [];
 
@@ -87,6 +88,7 @@ class SentryExtension extends CompilerExtension
             'user_fields' => Expect::listOf(Expect::string())->default([]),
             'session_sections' => Expect::listOf(Expect::string())->default([]),
             'priority_mapping' => Expect::arrayOf(Expect::string(), Expect::string())->default([]),
+            'ignore_exceptions' => Expect::listOf(Expect::string())->default([]),
             'traces_sample_rate' => Expect::float()->dynamic(),
             'profiles_sample_rate' => Expect::float()->dynamic(),
 
