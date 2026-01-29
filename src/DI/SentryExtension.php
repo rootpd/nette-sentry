@@ -39,20 +39,25 @@ class SentryExtension extends CompilerExtension
         $logger
             ->addSetup('setUserFields', [$this->config->user_fields])
             ->addSetup('setSessionSections', [$this->config->session_sections])
-            ->addSetup('setPriorityMapping', [$this->config->priority_mapping]);
+            ->addSetup('setPriorityMapping', [$this->config->priority_mapping])
+            ->addSetup('setIgnoredExceptions', [$this->config->ignore_exceptions]);
 
         $integrations = [];
 
         if ($this->config->traces_sample_rate !== null) {
             $logger->addSetup('setTracesSampleRate', [$this->config->traces_sample_rate]);
 
-            $this->getContainerBuilder()
+            $builder = $this->getContainerBuilder();
+            $builder
                 ->addDefinition($this->prefix('applicationMonitor'))
                 ->setFactory(ApplicationMonitor::class);
 
-            /** @var ServiceDefinition $application */
-            $application = $this->getContainerBuilder()->getDefinition('application.application');
-            $application->addSetup('@Rootpd\NetteSentry\ApplicationMonitor::hook', ['@self']);
+            // Only hook ApplicationMonitor if application service exists
+            if ($builder->hasDefinition('application.application')) {
+                /** @var ServiceDefinition $application */
+                $application = $builder->getDefinition('application.application');
+                $application->addSetup('@Rootpd\NetteSentry\ApplicationMonitor::hook', ['@self']);
+            }
 
             if ($this->config->profiles_sample_rate !== null) {
                 $logger->addSetup('setProfilesSampleRate', [$this->config->profiles_sample_rate]);
@@ -87,6 +92,7 @@ class SentryExtension extends CompilerExtension
             'user_fields' => Expect::listOf(Expect::string())->default([]),
             'session_sections' => Expect::listOf(Expect::string())->default([]),
             'priority_mapping' => Expect::arrayOf(Expect::string(), Expect::string())->default([]),
+            'ignore_exceptions' => Expect::listOf(Expect::string())->default([]),
             'traces_sample_rate' => Expect::float()->dynamic(),
             'profiles_sample_rate' => Expect::float()->dynamic(),
 

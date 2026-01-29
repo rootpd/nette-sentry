@@ -30,6 +30,7 @@ class SentryLogger extends Logger
     private array $userFields = [];
     private array $sessionSections = [];
     private array $priorityMapping = [];
+    private array $ignoredExceptions = [];
     private ?float $tracesSampleRate = null;
     private ?float $profilesSampleRate = null;
 
@@ -84,6 +85,11 @@ class SentryLogger extends Logger
         $this->priorityMapping = $priorityMapping;
     }
 
+    public function setIgnoredExceptions(array $ignoredExceptions)
+    {
+        $this->ignoredExceptions = $ignoredExceptions;
+    }
+
     public function setTracesSampleRate(float $tracesSampleRate)
     {
         $this->tracesSampleRate = $tracesSampleRate;
@@ -121,6 +127,16 @@ class SentryLogger extends Logger
         // if we still don't have severity, don't log anything
         if (!$severity) {
             return $response;
+        }
+
+        // Check if exception should be ignored
+        if ($value instanceof Throwable) {
+            foreach ($this->ignoredExceptions as $ignoredException) {
+                if ($value instanceof $ignoredException) {
+                    // Still log to Tracy, but skip sending to Sentry
+                    return $response;
+                }
+            }
         }
 
         configureScope(function (Scope $scope) use ($severity) {
