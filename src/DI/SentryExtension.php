@@ -47,13 +47,17 @@ class SentryExtension extends CompilerExtension
         if ($this->config->traces_sample_rate !== null) {
             $logger->addSetup('setTracesSampleRate', [$this->config->traces_sample_rate]);
 
-            $this->getContainerBuilder()
+            $builder = $this->getContainerBuilder();
+            $builder
                 ->addDefinition($this->prefix('applicationMonitor'))
                 ->setFactory(ApplicationMonitor::class);
 
-            /** @var ServiceDefinition $application */
-            $application = $this->getContainerBuilder()->getDefinition('application.application');
-            $application->addSetup('@Rootpd\NetteSentry\ApplicationMonitor::hook', ['@self']);
+            // Only hook ApplicationMonitor if application service exists
+            if ($builder->hasDefinition('application.application')) {
+                /** @var ServiceDefinition $application */
+                $application = $builder->getDefinition('application.application');
+                $application->addSetup('@Rootpd\NetteSentry\ApplicationMonitor::hook', ['@self']);
+            }
 
             if ($this->config->profiles_sample_rate !== null) {
                 $logger->addSetup('setProfilesSampleRate', [$this->config->profiles_sample_rate]);
